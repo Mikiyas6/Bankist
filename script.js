@@ -90,13 +90,16 @@ const currencies = new Map([
 
 /////////////////////////////////////////////////
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const createUserNames = function (accounts) {
+  accounts.forEach(function (account) {
+    const owner = account.owner.split(' ');
+    const initials = owner
+      .map(string => string[0])
+      .join('')
+      .toLowerCase();
+    account.userName = initials;
+    console.log(account);
+  });
+};
 
-const eurToUsd = 1.1;
-
-const movementsUSD = movements.map(function (movement) {
-  return movement * eurToUsd;
-});
-
-const movementUSD = movements.map(movement => movement * eurToUsd);
-console.log(movementUSD);
+createUserNames(accounts);
