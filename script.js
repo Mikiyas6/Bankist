@@ -35,8 +35,6 @@ const account4 = {
 
 const accounts = [account1, account2, account3, account4];
 
-const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
-
 // Elements
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
@@ -71,7 +69,7 @@ const displayMovements = function (movements) {
           <div class="movements__type movements__type--${type}">${
       index + 1
     } ${type} </div>
-          <div class="movements__value">${movement}</div>
+          <div class="movements__value">${movement}€</div>
         </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
@@ -92,6 +90,35 @@ const createUserNames = function (accounts) {
 
 createUserNames(accounts);
 
+const displayBalance = function (movements) {
+  const balance = movements.reduce(function (accumulator, movement) {
+    return accumulator + movement;
+  }, 0);
+  labelBalance.textContent = `${balance}€`;
+};
+
+displayBalance(account2.movements);
+
+const calcDisplaySummary = function (movements) {
+  const totalDeposit = movements
+    .filter(movement => movement > 0)
+    .reduce((total, deposit) => total + deposit, 0);
+  const totalWithdrawal = Math.abs(
+    movements
+      .filter(movement => movement < 0)
+      .reduce((total, withdrawal) => total + withdrawal, 0)
+  );
+  const interest = movements
+    .filter(movement => movement > 0)
+    .map(deposit => deposit * 0.012)
+    .filter(interest => interest >= 1)
+    .reduce((total, interest) => total + interest, 0);
+  labelSumIn.textContent = totalDeposit;
+  labelSumOut.textContent = totalWithdrawal;
+  labelSumInterest.textContent = interest;
+};
+
+calcDisplaySummary(account1.movements);
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -102,16 +129,6 @@ const currencies = new Map([
   ['GBP', 'Pound sterling'],
 ]);
 
-// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
-
-const deposits = movements.filter(function (movement) {
-  return movement > 0;
-});
-
-console.log(deposits);
-
-const withdrawals = movements.filter(movement => movement < 0);
-
-console.log(withdrawals);
