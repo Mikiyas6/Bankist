@@ -84,7 +84,6 @@ const createUserNames = function (accounts) {
       .join('')
       .toLowerCase();
     account.userName = initials;
-    console.log(account);
   });
 };
 
@@ -97,9 +96,10 @@ const displayBalance = function (movements) {
   labelBalance.textContent = `${balance}€`;
 };
 
-displayBalance(account2.movements);
+// displayBalance(account2.movements);
 
-const calcDisplaySummary = function (movements) {
+const calcDisplaySummary = function (account) {
+  const movements = account.movements;
   const totalDeposit = movements
     .filter(movement => movement > 0)
     .reduce((total, deposit) => total + deposit, 0);
@@ -110,7 +110,7 @@ const calcDisplaySummary = function (movements) {
   );
   const interest = movements
     .filter(movement => movement > 0)
-    .map(deposit => deposit * 0.012)
+    .map(deposit => (deposit * account.interestRate) / 100)
     .filter(interest => interest >= 1)
     .reduce((total, interest) => total + interest, 0);
   labelSumIn.textContent = totalDeposit;
@@ -118,7 +118,24 @@ const calcDisplaySummary = function (movements) {
   labelSumInterest.textContent = interest;
 };
 
-calcDisplaySummary(account1.movements);
+// calcDisplaySummary(account1.movements);
+
+btnLogin.addEventListener('click', function (event) {
+  event.preventDefault(); //Is used to prevent the default action that is associated with the event
+  const initials = inputLoginUsername.value;
+  const password = Number(inputLoginPin.value);
+  const account = accounts.find(account => account.userName === initials);
+  if (account && password === account.pin) {
+    containerApp.style.opacity = '100';
+    labelWelcome.textContent = `Good Day, ${account.owner.split(' ')[0]}!`;
+    inputLoginUsername.value = '';
+    inputLoginPin.value = '';
+    displayMovements(account.movements);
+    displayBalance(account.movements);
+    calcDisplaySummary(account);
+  }
+});
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
