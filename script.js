@@ -35,6 +35,8 @@ const account4 = {
 
 const accounts = [account1, account2, account3, account4];
 
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
 // Elements
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
@@ -76,6 +78,20 @@ const displayMovements = function (movements) {
 };
 displayMovements(account1.movements);
 
+const createUserNames = function (accounts) {
+  accounts.forEach(function (account) {
+    const owner = account.owner.split(' ');
+    const initials = owner
+      .map(string => string[0])
+      .join('')
+      .toLowerCase();
+    account.userName = initials;
+    console.log(account);
+  });
+};
+
+createUserNames(accounts);
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
@@ -90,16 +106,12 @@ const currencies = new Map([
 
 /////////////////////////////////////////////////
 
-const createUserNames = function (accounts) {
-  accounts.forEach(function (account) {
-    const owner = account.owner.split(' ');
-    const initials = owner
-      .map(string => string[0])
-      .join('')
-      .toLowerCase();
-    account.userName = initials;
-    console.log(account);
-  });
-};
+const deposits = movements.filter(function (movement) {
+  return movement > 0;
+});
 
-createUserNames(accounts);
+console.log(deposits);
+
+const withdrawals = movements.filter(movement => movement < 0);
+
+console.log(withdrawals);
