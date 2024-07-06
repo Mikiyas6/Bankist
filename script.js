@@ -179,6 +179,18 @@ btnClose.addEventListener('click', function (e) {
   }
 });
 
+btnLoan.addEventListener('click', function (e) {
+  e.preventDefault();
+  const loanRequest = Number(inputLoanAmount.value);
+  inputLoanAmount.value = '';
+
+  loanRequest > 0 &&
+    currentAccount.movements
+      .filter(movement => movement > 0)
+      .some(deposit => deposit > 0.1 * loanRequest) &&
+    currentAccount.movements.push(loanRequest) &&
+    updateUI(currentAccount);
+});
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
