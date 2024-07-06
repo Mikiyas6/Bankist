@@ -166,6 +166,19 @@ btnTransfer.addEventListener('click', function (e) {
   inputTransferAmount.value = '';
 });
 
+btnClose.addEventListener('click', function (e) {
+  e.preventDefault();
+  const initials = inputCloseUsername.value;
+  const password = Number(inputClosePin.value);
+  if (currentAccount.userName === initials && currentAccount.pin === password) {
+    const accountIndex = accounts.findIndex(
+      account => account.userName === currentAccount.userName
+    );
+    accounts.splice(accountIndex, 1);
+    containerApp.style.opacity = 0;
+  }
+});
+
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
 // LECTURES
