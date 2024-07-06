@@ -74,7 +74,6 @@ const displayMovements = function (movements) {
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
-displayMovements(account1.movements);
 
 const createUserNames = function (accounts) {
   accounts.forEach(function (account) {
@@ -89,14 +88,15 @@ const createUserNames = function (accounts) {
 
 createUserNames(accounts);
 
-const displayBalance = function (movements) {
+const displayBalance = function (account) {
+  const movements = account.movements;
   const balance = movements.reduce(function (accumulator, movement) {
     return accumulator + movement;
   }, 0);
-  labelBalance.textContent = `${balance}€`;
-};
 
-// displayBalance(account2.movements);
+  labelBalance.textContent = `${balance}€`;
+  account.balance = balance;
+};
 
 const calcDisplaySummary = function (account) {
   const movements = account.movements;
@@ -118,22 +118,52 @@ const calcDisplaySummary = function (account) {
   labelSumInterest.textContent = interest;
 };
 
-// calcDisplaySummary(account1.movements);
+const updateUI = function (account) {
+  displayMovements(account.movements);
+  displayBalance(account);
+  calcDisplaySummary(account);
+};
+
+let currentAccount;
 
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault(); //Is used to prevent the default action that is associated with the event
   const initials = inputLoginUsername.value;
   const password = Number(inputLoginPin.value);
-  const account = accounts.find(account => account.userName === initials);
-  if (account && password === account.pin) {
+  currentAccount = accounts.find(account => account.userName === initials);
+  if (currentAccount && password === currentAccount.pin) {
     containerApp.style.opacity = '100';
-    labelWelcome.textContent = `Good Day, ${account.owner.split(' ')[0]}!`;
+    labelWelcome.textContent = `Good Day, ${
+      currentAccount.owner.split(' ')[0]
+    }!`;
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
-    displayMovements(account.movements);
-    displayBalance(account.movements);
-    calcDisplaySummary(account);
+    updateUI(currentAccount);
   }
+});
+
+btnTransfer.addEventListener('click', function (e) {
+  e.preventDefault();
+  // The account from which we're transferring to
+  const initials = inputTransferTo.value;
+  const receiver = accounts.find(function (account) {
+    return account.userName === initials;
+  });
+  // The amount we're going to transfer
+  const amountTransfer = Number(inputTransferAmount.value);
+
+  if (
+    receiver &&
+    receiver.userName !== currentAccount.userName &&
+    amountTransfer > 0 &&
+    currentAccount.balance >= amountTransfer
+  ) {
+    currentAccount.movements.push(-1 * amountTransfer);
+    receiver.movements.push(amountTransfer);
+    updateUI(currentAccount);
+  }
+  inputTransferTo.value = '';
+  inputTransferAmount.value = '';
 });
 
 /////////////////////////////////////////////////
