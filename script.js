@@ -61,9 +61,10 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
   containerMovements.innerHTML = '';
-  movements.forEach(function (movement, index) {
+  const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+  movs.forEach(function (movement, index) {
     const type = movement > 0 ? 'deposit' : 'withdrawal';
     const html = ` <div class="movements__row">
           <div class="movements__type movements__type--${type}">${
@@ -125,7 +126,6 @@ const updateUI = function (account) {
 };
 
 let currentAccount;
-
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault(); //Is used to prevent the default action that is associated with the event
   const initials = inputLoginUsername.value;
@@ -190,6 +190,13 @@ btnLoan.addEventListener('click', function (e) {
       .some(deposit => deposit > 0.1 * loanRequest) &&
     currentAccount.movements.push(loanRequest) &&
     updateUI(currentAccount);
+});
+
+let isSorted = false;
+btnSort.addEventListener('click', function (e) {
+  e.preventDefault();
+  displayMovements(currentAccount.movements, !isSorted);
+  isSorted = !isSorted;
 });
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
