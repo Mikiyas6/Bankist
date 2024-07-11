@@ -81,6 +81,7 @@ const accounts = [account1, account2];
 // Elements
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
+// const labelMovementsDate = document.querySelector('.movements__date')
 const labelBalance = document.querySelector('.balance__value');
 const labelSumIn = document.querySelector('.summary__value--in');
 const labelSumOut = document.querySelector('.summary__value--out');
@@ -110,21 +111,30 @@ const now = new Date();
 const day = `${now.getDate()}`.padStart(2, 0);
 const month = `${now.getMonth() + 1}`.padStart(2, 0);
 const year = now.getFullYear();
-const hour = now.getHours();
-const minutes = now.getMinutes();
+const hour = `${now.getHours()}`.padStart(2, 0);
+const minutes = `${now.getMinutes()}`.padStart(2, 0);
 labelDate.textContent = `${day}/${month}/${year}, ${hour}:${minutes}`;
 
-const displayMovements = function (movements, sort = false) {
+const displayMovements = function (account, sort = false) {
+  const movements = account.movements;
+  labelDate.textContent = `${day}/${month}/${year}, ${hour}:${minutes}`;
+
   containerMovements.innerHTML = '';
   const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
   movs.forEach(function (movement, index) {
     const type = movement > 0 ? 'deposit' : 'withdrawal';
-    const html = ` <div class="movements__row">
-          <div class="movements__type movements__type--${type}">${
+    const displayDate = new Date(account.movementsDates[index]);
+    const day = `${displayDate.getDate()}`.padStart(2, 0);
+    const month = `${displayDate.getMonth() + 1}`.padStart(2, 0);
+    const year = displayDate.getFullYear();
+    const html = `
+      <div class="movements__row">
+        <div class="movements__type movements__type--${type}">${
       index + 1
-    } ${type} </div>
-          <div class="movements__value">${movement.toFixed(2)}€</div>
-        </div>`;
+    } ${type}</div>
+        <div class="movements__date">${`${day}/${month}/${year}`}</div>
+        <div class="movements__value">${movement.toFixed(2)}€</div>
+      </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
   });
 };
@@ -173,7 +183,7 @@ const calcDisplaySummary = function (account) {
 };
 
 const updateUI = function (account) {
-  displayMovements(account.movements);
+  displayMovements(account);
   displayBalance(account);
   calcDisplaySummary(account);
 };
@@ -212,6 +222,8 @@ btnTransfer.addEventListener('click', function (e) {
   ) {
     currentAccount.movements.push(-1 * amountTransfer);
     receiver.movements.push(amountTransfer);
+    currentAccount.movementsDates.push(new Date().toISOString());
+    receiver.movementsDates.push(new Date().toISOString());
     updateUI(currentAccount);
   }
   inputTransferTo.value = '';
@@ -241,13 +253,15 @@ btnLoan.addEventListener('click', function (e) {
       .filter(movement => movement > 0)
       .some(deposit => deposit > 0.1 * loanRequest) &&
     currentAccount.movements.push(loanRequest) &&
-    updateUI(currentAccount);
+    currentAccount.movementsDates.push(new Date().toISOString()) &&
+    receiver.movementsDates.push(new Date().toISOString());
+  updateUI(currentAccount);
 });
 
 let isSorted = false;
 btnSort.addEventListener('click', function (e) {
   e.preventDefault();
-  displayMovements(currentAccount.movements, !isSorted);
+  displayMovements(currentAccount, !isSorted);
   isSorted = !isSorted;
 });
 /////////////////////////////////////////////////
