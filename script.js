@@ -17,10 +17,10 @@ const account1 = {
     '2019-12-23T07:42:02.383Z',
     '2020-01-28T09:15:04.904Z',
     '2020-04-01T10:17:24.185Z',
-    '2020-05-08T14:11:59.604Z',
-    '2020-05-27T17:01:17.194Z',
-    '2020-07-11T23:36:17.929Z',
-    '2020-07-12T10:51:36.790Z',
+    '2024-07-05T14:11:59.604Z',
+    '2024-05-08T17:01:17.194Z',
+    '2024-07-09T23:36:17.929Z',
+    '2024-07-11T10:51:36.790Z',
   ],
   currency: 'EUR',
   locale: 'pt-PT', // de-DE
@@ -106,33 +106,39 @@ const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
 let currentAccount;
-
 const now = new Date();
-const day = `${now.getDate()}`.padStart(2, 0);
-const month = `${now.getMonth() + 1}`.padStart(2, 0);
-const year = now.getFullYear();
-const hour = `${now.getHours()}`.padStart(2, 0);
-const minutes = `${now.getMinutes()}`.padStart(2, 0);
-labelDate.textContent = `${day}/${month}/${year}, ${hour}:${minutes}`;
+
+const formatMovementDate = function (date) {
+  const calcDaysPassed = (date1, date2) =>
+    Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
+  const daysPassed = calcDaysPassed(now, date);
+  if (daysPassed === 0) return 'Today';
+  else if (daysPassed === 1) return 'Yesterday';
+  else if (daysPassed <= 7) return `${daysPassed} days ago`;
+  else {
+    const day = `${date.getDate()}`.padStart(2, 0);
+    const month = `${date.getMonth() + 1}`.padStart(2, 0);
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  }
+};
 
 const displayMovements = function (account, sort = false) {
   const movements = account.movements;
-  labelDate.textContent = `${day}/${month}/${year}, ${hour}:${minutes}`;
-
   containerMovements.innerHTML = '';
   const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
   movs.forEach(function (movement, index) {
     const type = movement > 0 ? 'deposit' : 'withdrawal';
-    const displayDate = new Date(account.movementsDates[index]);
-    const day = `${displayDate.getDate()}`.padStart(2, 0);
-    const month = `${displayDate.getMonth() + 1}`.padStart(2, 0);
-    const year = displayDate.getFullYear();
+    console.log(account.movementsDates[index]);
+    const displayDate = formatMovementDate(
+      new Date(account.movementsDates[index])
+    );
     const html = `
       <div class="movements__row">
         <div class="movements__type movements__type--${type}">${
       index + 1
     } ${type}</div>
-        <div class="movements__date">${`${day}/${month}/${year}`}</div>
+        <div class="movements__date">${displayDate}</div>
         <div class="movements__value">${movement.toFixed(2)}€</div>
       </div>`;
     containerMovements.insertAdjacentHTML('afterbegin', html);
@@ -201,6 +207,12 @@ btnLogin.addEventListener('click', function (event) {
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
     updateUI(currentAccount);
+    const day = `${now.getDate()}`.padStart(2, 0);
+    const month = `${now.getMonth() + 1}`.padStart(2, 0);
+    const year = now.getFullYear();
+    const hour = `${now.getHours()}`.padStart(2, 0);
+    const minutes = `${now.getMinutes()}`.padStart(2, 0);
+    labelDate.textContent = `${day}/${month}/${year}, ${hour}:${minutes}`;
   }
 });
 
@@ -248,14 +260,14 @@ btnLoan.addEventListener('click', function (e) {
   const loanRequest = Math.floor(inputLoanAmount.value);
   inputLoanAmount.value = '';
 
-  loanRequest > 0 &&
+  if (loanRequest > 0) {
     currentAccount.movements
       .filter(movement => movement > 0)
-      .some(deposit => deposit > 0.1 * loanRequest) &&
-    currentAccount.movements.push(loanRequest) &&
-    currentAccount.movementsDates.push(new Date().toISOString()) &&
-    receiver.movementsDates.push(new Date().toISOString());
-  updateUI(currentAccount);
+      .some(deposit => deposit > 0.1 * loanRequest);
+    currentAccount.movements.push(loanRequest);
+    currentAccount.movementsDates.push(new Date());
+    updateUI(currentAccount);
+  }
 });
 
 let isSorted = false;
