@@ -1,0 +1,49 @@
+/* - Font sizes (px)
+10 / 12 / 14 / 16 / 18 / 20 / 24 / 30 / 36 / 44 / 52 / 62 / 74 / 86 / 98
+
+- Spacing system (px)
+2 / 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 80 / 96 / 128 */
+
+/*  -> we always use em for media queries*/
+
+/* ********************************  */
+/* For Small Laptops(Below 1366px) ->  1366px/16px = 85.375em */
+/* ******************************** */
+@media (max-width: 85.375em) {
+}
+
+/* ********************************  */
+/* For Landscape Tablets(Below 1200px) ->  1200px/16px = 75em */
+/* ******************************** */
+
+@media (max-width: 75em) {
+  /* 9px/16px =  0.5625*/
+  /* font-size Adjustment */
+  html {
+    font-size: 56.25%;
+  }
+}
+
+/* ********************************  */
+/* For Small-Tablets(Below 760px) ->  760px/16px = 47.5em */
+/* ******************************** */
+@media (max-width: 47.5em) {
+  /* 7px/16px =  0.4375*/
+  html {
+    font-size: 50%;
+  }
+  .operation--loan {
+    grid-column: 1 / span 1;
+    grid-row: 6/7;
+  }
+  .operation--close {
+    grid-row: 7/8;
+  }
+  .summary {
+    grid-row: 8/9;
+  }
+  .logout-timer {
+    grid-row: 8/9;
+    grid-column: 2 / span 1;
+  }
+}

@@ -23,7 +23,7 @@ const account1 = {
     '2024-07-11T10:51:36.790Z',
   ],
   currency: 'EUR',
-  locale: 'pt-PT', // de-DE
+  locale: 'en-US', // de-DE
 };
 
 const account2 = {
@@ -105,10 +105,9 @@ const inputLoanAmount = document.querySelector('.form__input--loan-amount');
 const inputCloseUsername = document.querySelector('.form__input--user');
 const inputClosePin = document.querySelector('.form__input--pin');
 
-let currentAccount;
+let currentAccount, timer;
 const now = new Date();
-
-const formatMovementDate = function (date) {
+const formatMovementDate = function (date, locale) {
   const calcDaysPassed = (date1, date2) =>
     Math.round(Math.abs(date2 - date1) / (1000 * 60 * 60 * 24));
   const daysPassed = calcDaysPassed(now, date);
@@ -116,10 +115,7 @@ const formatMovementDate = function (date) {
   else if (daysPassed === 1) return 'Yesterday';
   else if (daysPassed <= 7) return `${daysPassed} days ago`;
   else {
-    const day = `${date.getDate()}`.padStart(2, 0);
-    const month = `${date.getMonth() + 1}`.padStart(2, 0);
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    return new Intl.DateTimeFormat(locale).format(date);
   }
 };
 
@@ -131,7 +127,8 @@ const displayMovements = function (account, sort = false) {
     const type = movement > 0 ? 'deposit' : 'withdrawal';
     console.log(account.movementsDates[index]);
     const displayDate = formatMovementDate(
-      new Date(account.movementsDates[index])
+      new Date(account.movementsDates[index]),
+      account.locale
     );
     const html = `
       <div class="movements__row">
@@ -194,6 +191,35 @@ const updateUI = function (account) {
   calcDisplaySummary(account);
 };
 
+const startLogOutTimer = function () {
+  // Set time to 5 minutes
+
+  let time = 600;
+  let min = Math.floor(time / 60);
+  let sec = String(time % 60);
+  // Call the timer every second
+  timer = setInterval(function () {
+    // In each call, print the remaining time to UI
+    labelTimer.textContent = `${min}:${sec.padStart(2, '0')}`;
+    sec -= 1;
+    sec = String(sec);
+    if (sec === '-1') {
+      sec = '59';
+    }
+    if (sec === '59') {
+      min -= 1;
+    }
+    // When 0 seconds, stop timer and log out user
+    if (min === 0 && sec === '0') {
+      labelTimer.textContent = `${min}:${sec.padStart(2, '0')}`;
+      clearInterval(timer);
+      labelWelcome.textContent = 'Log in to get started';
+      containerApp.style.opacity = 0;
+    }
+  }, 1000);
+  return timer;
+};
+
 btnLogin.addEventListener('click', function (event) {
   event.preventDefault(); //Is used to prevent the default action that is associated with the event
   const initials = inputLoginUsername.value;
@@ -206,13 +232,24 @@ btnLogin.addEventListener('click', function (event) {
     }!`;
     inputLoginUsername.value = '';
     inputLoginPin.value = '';
+    inputLoginUsername.blur();
+    inputLoginPin.blur();
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      Weekday: 'long ',
+    };
+    // const locale = navigator.language
+    labelDate.textContent = new Intl.DateTimeFormat(
+      currentAccount.locale,
+      options
+    ).format(now);
     updateUI(currentAccount);
-    const day = `${now.getDate()}`.padStart(2, 0);
-    const month = `${now.getMonth() + 1}`.padStart(2, 0);
-    const year = now.getFullYear();
-    const hour = `${now.getHours()}`.padStart(2, 0);
-    const minutes = `${now.getMinutes()}`.padStart(2, 0);
-    labelDate.textContent = `${day}/${month}/${year}, ${hour}:${minutes}`;
+    if (timer) clearInterval(timer);
+    timer = startLogOutTimer();
   }
 });
 
@@ -237,6 +274,8 @@ btnTransfer.addEventListener('click', function (e) {
     currentAccount.movementsDates.push(new Date().toISOString());
     receiver.movementsDates.push(new Date().toISOString());
     updateUI(currentAccount);
+    clearInterval(timer);
+    timer = startLogOutTimer();
   }
   inputTransferTo.value = '';
   inputTransferAmount.value = '';
@@ -260,13 +299,19 @@ btnLoan.addEventListener('click', function (e) {
   const loanRequest = Math.floor(inputLoanAmount.value);
   inputLoanAmount.value = '';
 
-  if (loanRequest > 0) {
+  if (
+    loanRequest > 0 &&
     currentAccount.movements
       .filter(movement => movement > 0)
-      .some(deposit => deposit > 0.1 * loanRequest);
-    currentAccount.movements.push(loanRequest);
-    currentAccount.movementsDates.push(new Date());
-    updateUI(currentAccount);
+      .some(deposit => deposit > 0.1 * loanRequest)
+  ) {
+    setTimeout(function () {
+      currentAccount.movements.push(loanRequest);
+      currentAccount.movementsDates.push(new Date());
+      updateUI(currentAccount);
+    }, 4000);
+    clearInterval(timer);
+    timer = startLogOutTimer();
   }
 });
 
