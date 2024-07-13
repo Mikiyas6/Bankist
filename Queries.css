@@ -32,6 +32,14 @@
   html {
     font-size: 50%;
   }
+  nav {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .login {
+    flex-direction: column;
+    gap: 1rem;
+  }
   .operation--loan {
     grid-column: 1 / span 1;
     grid-row: 6/7;
