@@ -95,7 +95,6 @@ const displayMovements = function (account, sort = false) {
   const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
   movs.forEach(function (movement, index) {
     const type = movement > 0 ? 'deposit' : 'withdrawal';
-    console.log(account.movementsDates[index]);
     const displayDate = formatMovementDate(
       new Date(account.movementsDates[index]),
       account.locale
@@ -161,32 +160,55 @@ const updateUI = function (account) {
   calcDisplaySummary(account);
 };
 
-const startLogOutTimer = function () {
-  // Set time to 5 minutes
+// const startLogOutTimer = function () {
+//   // Set time to 10 minutes
 
-  let time = 600;
-  let min = Math.floor(time / 60);
-  let sec = String(time % 60);
-  // Call the timer every second
-  timer = setInterval(function () {
-    // In each call, print the remaining time to UI
-    labelTimer.textContent = `${min}:${sec.padStart(2, '0')}`;
-    sec -= 1;
-    sec = String(sec);
-    if (sec === '-1') {
-      sec = '59';
-    }
-    if (sec === '59') {
-      min -= 1;
-    }
+//   let time = 10;
+//   let min = Math.floor(time / 60);
+//   let sec = String(time % 60);
+//   // Call the timer every second
+//   timer = setInterval(function () {
+//     // In each call, print the remaining time to UI
+//     labelTimer.textContent = `${min}:${sec.padStart(2, '0')}`;
+//     sec -= 1;
+//     sec = String(sec);
+//     if (sec === '-1') sec = '59';
+
+//     if (sec === '59') min -= 1;
+//     // When 0 seconds, stop timer and log out user
+//     if (min === 0 && sec === '0') {
+//       labelTimer.textContent = `${min}:${sec.padStart(2, '0')}`;
+//       clearInterval(timer);
+//       labelWelcome.textContent = 'Log in to get started';
+//       containerApp.style.opacity = 0;
+//     }
+//   }, 1000);
+//   return timer;
+// };
+
+const startLogOutTimer = function () {
+  // Set time to 10 minutes
+  let time = 10 * 60; // 10 minutes in seconds
+
+  const timer = setInterval(function () {
+    // Calculate minutes and seconds
+    const min = Math.floor(time / 60);
+    const sec = String(time % 60).padStart(2, '0');
+
+    // Print the remaining time to UI
+    labelTimer.textContent = `${min}:${sec}`;
+
+    // Decrement the time
+    time--;
+
     // When 0 seconds, stop timer and log out user
-    if (min === 0 && sec === '0') {
-      labelTimer.textContent = `${min}:${sec.padStart(2, '0')}`;
+    if (time < 0) {
       clearInterval(timer);
       labelWelcome.textContent = 'Log in to get started';
       containerApp.style.opacity = 0;
     }
   }, 1000);
+
   return timer;
 };
 

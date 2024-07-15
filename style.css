@@ -1,9 +1,3 @@
-/*
- * Use this CSS to learn some intersting techniques,
- * in case you're wondering how I built the UI.
- * Have fun! 😁
- */
-
 * {
   margin: 0;
   padding: 0;
@@ -14,15 +8,10 @@ html {
   font-size: 62.5%;
   box-sizing: border-box;
 }
-/* html,
-body {
-  overflow-x: hidden;
-} */
 body {
   font-family: 'Poppins', sans-serif;
   color: #444;
   background-color: #f3f3f3;
-  min-height: 100vh;
   padding: 2rem;
 }
 
@@ -93,7 +82,7 @@ nav {
   margin: 4rem auto;
   display: grid;
   grid-template-columns: 4fr 3fr;
-  grid-template-rows: auto repeat(3, 15rem) repeat(3, 15rem) auto;
+  grid-template-rows: auto 45rem repeat(3, 15rem) auto;
   gap: 2rem;
   padding-right: 3rem;
   padding-left: 3rem;
@@ -130,7 +119,6 @@ nav {
 /* MOVEMENTS */
 .movements {
   grid-column: 1 / span 2;
-  grid-row: 2 / span 3;
   background-color: #fff;
   border-radius: 1rem;
   overflow: scroll;
@@ -176,10 +164,12 @@ nav {
 /* SUMMARY */
 .summary {
   grid-column: 1 / span 1;
+  grid-row: 6 / span 1;
   display: flex;
   align-items: baseline;
   padding: 0 0.3rem;
   margin-top: 1rem;
+  position: relative;
 }
 
 .summary__label {
@@ -210,6 +200,9 @@ nav {
   font-size: 1.3rem;
   font-weight: 500;
   cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  right: -4rem;
 }
 
 /* OPERATIONS */
@@ -221,18 +214,18 @@ nav {
 }
 
 .operation--transfer {
-  grid-row: 5 / 6;
+  grid-row: 3 / 4;
   background-image: linear-gradient(to top left, #ffb003, #ffcb03);
 }
 
 .operation--loan {
-  grid-column: 2 / span 1;
-  grid-row: 5 / 6;
+  grid-column: 1 / span 1;
+  grid-row: 4 / 5;
   background-image: linear-gradient(to top left, #39b385, #9be15d);
 }
 
 .operation--close {
-  grid-row: 6 / 7;
+  grid-row: 5 / 6;
   background-image: linear-gradient(to top left, #e52a5a, #ff585f);
 }
 
@@ -297,6 +290,8 @@ h2 {
 }
 
 .logout-timer {
+  grid-column: 2 / span 1;
+  grid-row: 6 / span 1;
   padding: 0 0.3rem;
   margin-top: 1.9rem;
   text-align: right;
